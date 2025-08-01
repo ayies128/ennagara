@@ -64,21 +64,35 @@ export class QiitaService {
       return 'Qiitaトレンド.txt';
     }
     
+    console.log('feedUpdated input:', feedUpdated);
+    
     // ISO 8601形式の日付文字列から日付部分を直接抽出
     // 例: "2025-08-01T05:00:00+09:00" -> "2025-08-01"
     const dateMatch = feedUpdated.match(/^(\d{4})-(\d{2})-(\d{2})/);
     
+    console.log('dateMatch result:', dateMatch);
+    
     if (dateMatch) {
       const [, year, month, day] = dateMatch;
-      return `${year}${month}${day}_Qiitaトレンド.txt`;
+      const filename = `${year}${month}${day}_Qiitaトレンド.txt`;
+      console.log('Generated filename (regex):', filename);
+      return filename;
     }
     
     // フォールバック: 正規表現が失敗した場合はDateオブジェクトを使用
+    console.log('Using Date fallback');
     const updated = new Date(feedUpdated);
+    console.log('Parsed date:', updated);
+    console.log('Date toISOString:', updated.toISOString());
+    console.log('Date getTimezoneOffset:', updated.getTimezoneOffset());
+    
     const year = updated.getFullYear();
     const month = String(updated.getMonth() + 1).padStart(2, '0');
     const day = String(updated.getDate()).padStart(2, '0');
     
-    return `${year}${month}${day}_Qiitaトレンド.txt`;
+    const filename = `${year}${month}${day}_Qiitaトレンド.txt`;
+    console.log('Generated filename (Date):', filename);
+    
+    return filename;
   }
 }
