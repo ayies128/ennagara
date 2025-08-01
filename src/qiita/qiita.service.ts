@@ -64,6 +64,16 @@ export class QiitaService {
       return 'Qiitaトレンド.txt';
     }
     
+    // ISO 8601形式の日付文字列から日付部分を直接抽出
+    // 例: "2025-08-01T05:00:00+09:00" -> "2025-08-01"
+    const dateMatch = feedUpdated.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      return `${year}${month}${day}_Qiitaトレンド.txt`;
+    }
+    
+    // フォールバック: 正規表現が失敗した場合はDateオブジェクトを使用
     const updated = new Date(feedUpdated);
     const year = updated.getFullYear();
     const month = String(updated.getMonth() + 1).padStart(2, '0');
