@@ -8,22 +8,30 @@ export interface QiitaItem {
   updated: string;
 }
 
+export interface QiitaFeedData {
+  items: QiitaItem[];
+  feedUpdated: string;
+}
+
 @Injectable()
 export class QiitaService {
   private readonly rssUrl = 'https://qiita.com/popular-items/feed';
 
-  async fetchTrendingItems(): Promise<QiitaItem[]> {
+  async fetchTrendingData(): Promise<QiitaFeedData> {
     try {
       const response = await axios.get(this.rssUrl);
       const parser = new xml2js.Parser();
       const result = await parser.parseStringPromise(response.data);
       
-      const items = result.feed.entry || [];
-      return items.slice(0, 20).map((item: any) => ({
+      const items = (result.feed.entry || []).slice(0, 20).map((item: any) => ({
         title: item.title[0],
         link: this.cleanUrl(item.link[0].$.href),
         updated: item.updated[0]
       }));
+      
+      const feedUpdated = result.feed.updated[0];
+      
+      return { items, feedUpdated };
     } catch (error) {
       throw new Error(`Failed to fetch RSS feed: ${error.message}`);
     }
@@ -51,12 +59,12 @@ export class QiitaService {
     return `${headerText}\n${titleAndUrlList}\n\n\n\n\n\n${urlOnlyList}`;
   }
 
-  generateFileName(items: QiitaItem[]): string {
-    if (items.length === 0) {
+  generateFileName(feedUpdated: string): string {
+    if (!feedUpdated) {
       return 'Qiitaトレンド.txt';
     }
     
-    const updated = new Date(items[0].updated);
+    const updated = new Date(feedUpdated);
     const year = updated.getFullYear();
     const month = String(updated.getMonth() + 1).padStart(2, '0');
     const day = String(updated.getDate()).padStart(2, '0');

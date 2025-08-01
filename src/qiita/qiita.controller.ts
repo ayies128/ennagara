@@ -9,9 +9,9 @@ export class QiitaController {
   @Get('trend')
   async downloadTrend(@Res() res: Response) {
     try {
-      const items = await this.qiitaService.fetchTrendingItems();
+      const { items, feedUpdated } = await this.qiitaService.fetchTrendingData();
       const content = this.qiitaService.generateTxtContent(items);
-      const fileName = this.qiitaService.generateFileName(items);
+      const fileName = this.qiitaService.generateFileName(feedUpdated);
 
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
