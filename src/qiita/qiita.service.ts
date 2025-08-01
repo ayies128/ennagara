@@ -66,10 +66,10 @@ export class QiitaService {
     
     console.log('feedUpdated input:', feedUpdated);
     
-    // ISO 8601形式の日付文字列から日付部分を直接抽出
-    // 例: "2025-08-01T05:00:00+09:00" -> "2025-08-01"
-    const dateMatch = feedUpdated.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    // 複数の方法で日付抽出を試行
     
+    // 方法1: ISO 8601形式の日付文字列から日付部分を直接抽出
+    const dateMatch = feedUpdated.match(/^(\d{4})-(\d{2})-(\d{2})/);
     console.log('dateMatch result:', dateMatch);
     
     if (dateMatch) {
@@ -79,19 +79,30 @@ export class QiitaService {
       return filename;
     }
     
-    // フォールバック: 正規表現が失敗した場合はDateオブジェクトを使用
-    console.log('Using Date fallback');
-    const updated = new Date(feedUpdated);
-    console.log('Parsed date:', updated);
-    console.log('Date toISOString:', updated.toISOString());
-    console.log('Date getTimezoneOffset:', updated.getTimezoneOffset());
+    // 方法2: substring で日付部分を直接切り出し
+    if (feedUpdated.length >= 10 && feedUpdated.charAt(4) === '-' && feedUpdated.charAt(7) === '-') {
+      const datePart = feedUpdated.substring(0, 10); // "2025-08-01"
+      const filename = `${datePart.replace(/-/g, '')}_Qiitaトレンド.txt`;
+      console.log('Generated filename (substring):', filename);
+      return filename;
+    }
     
-    const year = updated.getFullYear();
-    const month = String(updated.getMonth() + 1).padStart(2, '0');
-    const day = String(updated.getDate()).padStart(2, '0');
+    // 方法3: フォールバック - JSTタイムゾーンを考慮してDateオブジェクトを使用
+    console.log('Using Date fallback with timezone correction');
+    const updated = new Date(feedUpdated);
+    console.log('Original parsed date:', updated);
+    console.log('UTC ISO string:', updated.toISOString());
+    
+    // JSTに強制変換 (UTC+9)
+    const jstTime = new Date(updated.getTime() + (9 * 60 * 60 * 1000));
+    console.log('JST corrected time:', jstTime);
+    
+    const year = jstTime.getUTCFullYear();
+    const month = String(jstTime.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(jstTime.getUTCDate()).padStart(2, '0');
     
     const filename = `${year}${month}${day}_Qiitaトレンド.txt`;
-    console.log('Generated filename (Date):', filename);
+    console.log('Generated filename (Date with JST):', filename);
     
     return filename;
   }
