@@ -47,16 +47,21 @@ export class QiitaService {
   }
 
   generateTxtContent(items: QiitaItem[]): string {
-    const headerText = `本日のQiitaのトレンドをAIでまとめています。
-通勤時や退勤時などにながら聞きしてはいかがでしょうか？
-気になった記事は下記リンクから詳細へ！
+    const headerText = `【Qiitaトレンドまとめ】毎日更新！通勤・退勤のお供にエンジニアニュースをながら聞き📻
 
-出典`;
+本日のQiitaトレンドをAIでサクッとまとめ！
+通勤時や退勤時など、ながら聞きで最新技術・話題をキャッチしよう💡
+気になった記事は下記リンクから詳細へ✅
+
+--- 本日のトレンド ---`;
     
-    const titleAndUrlList = items.map(item => `${item.title}\n${item.link}`).join('\n');
+    const titleAndUrlList = items.map(item => `${item.title}\n${item.link}`).join('\n\n');
+    const footer = `--- 出典：Qiita ---
+
+#初心者 #ChatGPT #生成AI #AI #AWS #Python #JavaScript #Qiita #エンジニアニュース #ポッドキャスト`;
     const urlOnlyList = items.map(item => item.link).join('\n');
     
-    return `${headerText}\n${titleAndUrlList}\n\n\n\n\n\n${urlOnlyList}`;
+    return `${headerText}\n${titleAndUrlList}\n\n${footer}\n\n\n\n\n\n${urlOnlyList}`;
   }
 
   generateFileName(feedUpdated: string): string {
