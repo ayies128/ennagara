@@ -10,7 +10,9 @@ export class QiitaController {
   async downloadTrend(@Res() res: Response) {
     try {
       const { items, feedUpdated } = await this.qiitaService.fetchTrendingData();
-      const content = this.qiitaService.generateTxtContent(items);
+      const itemsWithTags = await this.qiitaService.fetchAllTags(items);
+      const topTags = this.qiitaService.getTopTags(itemsWithTags, 10);
+      const content = this.qiitaService.generateTxtContent(itemsWithTags, topTags, feedUpdated);
       const fileName = this.qiitaService.generateFileName(feedUpdated);
 
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
